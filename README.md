@@ -1,4 +1,4 @@
-== Game Physics Experiments/Research ==
+# Game Physics Experiments/Research
 
 References:
 - http://gafferongames.com/game-physics/
