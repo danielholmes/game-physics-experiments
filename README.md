@@ -1,6 +1,12 @@
 # Game Physics Experiments/Research
 
-References:
+## Running
+- Requires Nodejs and npm
+- ```npm install .``` from the root
+- ```./build``` to build once, ```./build-watch``` to continuously compile
+- View ```examples.html``` for some references or ```app.html``` for an interactive app
+
+## References
 - http://gafferongames.com/game-physics/
 - http://www.calctool.org/CALC/eng/aerospace/terminal
 - http://www.grc.nasa.gov/WWW/k-12/airplane/falling.html
