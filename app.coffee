@@ -14,14 +14,18 @@ class SimulationRun
         throw new Error("No dt method")
 
     progress: ->
+        previousT = @t
+        previousState = @state
+
         dt = @calculateDt()
         @performStep(dt)
         if @state.x >= 0
             @scheduleStep()
+            @performDisruption()
         else
             @running = false
 
-        # Disruption
+    performDisruption: ->
         minSecsDisruption = parseFloat($("#minSecsDisruption").val())
         maxSecsDisruption = parseFloat($("#maxSecsDisruption").val())
         range = maxSecsDisruption - minSecsDisruption
@@ -95,10 +99,33 @@ class AccumulatorFixedStepSimulationRun extends VariableStepSimulationRun
         @accumulator = 0
         super
 
+class ApproxState extends State
+    constructor: (tempState, @dt, @fixedState) ->
+        super(tempState.x, tempState.v)
+
+class AccumulatorFixedStepWithApproxSimulationRun extends AccumulatorFixedStepSimulationRun
+    progress: ->
+        if @state instanceof ApproxState
+            @accumulator += @state.dt
+            @t -= @state.dt
+            @state = @state.fixedState
+        super()
+
+    performStep: (dt) ->
+        super(dt)
+        if @accumulator > 0
+            remainingDt = @accumulator
+            @accumulator = 0
+
+            tempState = @integration(@state, @t, remainingDt, @accelerant)
+            @state = new ApproxState(tempState, remainingDt, @state)
+            @t += remainingDt
+
 class SimSpec
     initialPosition: 0
     initialVelocity: 0
     integrationName: null
+    integrationFixedStep: null
     accelerationName: null
     stepName: null
     accelerationStepAmount: null
@@ -111,12 +138,12 @@ addSim = ->
     spec.initialPosition = parseFloat($("#initialPosition").val())
     spec.initialVelocity = parseFloat($("#initialVelocity").val())
     spec.integrationName = $('input[name="integrationType"]:radio:checked').val()
+    spec.integrationFixedStep = parseFloat($("#integrationTypeFixedStep").val())
     spec.accelerationName = $('input[name="acceleration"]:radio:checked').val()
     spec.stepName = $('input[name="stepType"]:radio:checked').val()
     if spec.accelerationName is 'constant'
         spec.accelerationStepAmount = $("#accelerationConstantAmount").val()
 
-    console.log(spec.initialPosition)
     simSpecs.push(spec)
     renderSimList()
     sims.push(createSimFromSpec(spec))
@@ -144,10 +171,11 @@ createSimFromSpec = (spec) ->
         when "humanOnEarth" then accelerant = personFallingThroughAirAcceleration
 
     switch spec.stepName
-        when "fixed" then new FixedStepSimulationRun(initialState, integrationType, accelerant, 0.02)
+        when "fixed" then new FixedStepSimulationRun(initialState, integrationType, accelerant, spec.integrationFixedStep)
         when "variable" then new VariableStepSimulationRun(initialState, integrationType, accelerant)
-        when "semiFixed" then new SemiFixedStepSimulationRun(initialState, integrationType, accelerant, 0.02)
-        when "accumulatorFixed" then new AccumulatorFixedStepSimulationRun(initialState, integrationType, accelerant, 0.02)
+        when "semiFixed" then new SemiFixedStepSimulationRun(initialState, integrationType, accelerant, spec.integrationFixedStep)
+        when "accumulatorFixed" then new AccumulatorFixedStepSimulationRun(initialState, integrationType, accelerant, spec.integrationFixedStep)
+        when "accumulatorFixedWithApprox" then new AccumulatorFixedStepWithApproxSimulationRun(initialState, integrationType, accelerant, spec.integrationFixedStep)
 
 renderSimList = ->
     simTableBody = $("#sim-table tbody")
@@ -161,7 +189,7 @@ renderSimList = ->
             .append($("<td>#{spec.initialVelocity}</td>"))
             .append($("<td>#{spec.integrationName}</td>"))
             .append($("<td>#{acceleration}</td>"))
-            .append($("<td>#{spec.stepName}</td>"))
+            .append($("<td>#{spec.stepName}  #{spec.integrationFixedStep}</td>"))
             .append($('<td><a href="#" class="remove">Remove</a></td>'))
             .data("specIndex", index)
             .appendTo(simTableBody)
@@ -177,6 +205,10 @@ render = ->
     context = canvas.getContext("2d")
     context.clearRect 0, 0, canvas.width, canvas.height
 
+    groundPixels = 20
+    context.fillStyle = "#000000"
+    context.fillRect(0, canvas.height - groundPixels, canvas.width, 1)
+
     someRunning = false
     for sim, index in sims
         if sim.running
@@ -190,10 +222,10 @@ render = ->
         pixelWidth = width * pixelsPerMetre
         pixelHeight = height * pixelsPerMetre
         x = ((index + 1) * 50) - (pixelWidth / 2)
-        y = canvas.height - (sim.state.x * pixelsPerMetre) - pixelHeight
+        y = canvas.height - (sim.state.x * pixelsPerMetre) - pixelHeight - groundPixels
         context.fillRect(x, y, pixelWidth, pixelHeight)
 
-        highestPostionY = canvas.height - (sim.highestX * pixelsPerMetre) - pixelHeight
+        highestPostionY = canvas.height - (sim.highestX * pixelsPerMetre) - pixelHeight - groundPixels
         context.fillRect(x, highestPostionY, pixelWidth, 1)
         
 

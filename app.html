@@ -33,9 +33,16 @@
                                 Semi-Fixed
                             </label>
                             <label for="stepTypeAccumulatorFixed">
-                                <input id="stepTypeAccumulatorFixed" name="stepType" type="radio" value="accumulatorFixed" checked="checked" />
+                                <input id="stepTypeAccumulatorFixed" name="stepType" type="radio" value="accumulatorFixed" />
                                 Accumulator Fixed
                             </label>
+                            <label for="stepTypeAccumulatorFixedWithApprox">
+                                <input id="stepTypeAccumulatorFixedWithApprox" name="stepType" type="radio" value="accumulatorFixedWithApprox" checked="checked" />
+                                Accumulator Fixed With Approximations
+                            </label>
+                            <br />
+                            <label for="integrationTypeFixedStep">Fixed Step</label>
+                            <input type="number" id="integrationTypeFixedStep" name="integrationTypeStep" value="0.02" min="0.001" max="2" step="0.001" />
 
                             <h4>Integration</h4>
                             <label for="integrationEuler">
