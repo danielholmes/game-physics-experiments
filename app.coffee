@@ -142,7 +142,7 @@ addSim = ->
     spec.accelerationName = $('input[name="acceleration"]:radio:checked').val()
     spec.stepName = $('input[name="stepType"]:radio:checked').val()
     if spec.accelerationName is 'constant'
-        spec.accelerationStepAmount = $("#accelerationConstantAmount").val()
+        spec.accelerationStepAmount = parseFloat($("#accelerationConstantAmount").val())
 
     simSpecs.push(spec)
     renderSimList()
@@ -234,6 +234,14 @@ render = ->
 
 
 $(document).ready -> 
+    if not window.requestAnimationFrame?
+        window.requestAnimationFrame = 
+            window.webkitRequestAnimationFrame or
+            window.mozRequestAnimationFrame or
+            window.oRequestAnimationFrame or
+            window.msRequestAnimationFrame or
+            (callback, element) -> setTimeout(callback, 1000 / 60)
+
     $("#run-params").submit ->
         start()
         false
@@ -242,11 +250,10 @@ $(document).ready ->
         addSim()
         false
 
-    $("#sim-table").on("click", "a.remove", (event) ->
+    $("#sim-table").on "click", "a.remove", (event) ->
         specIndex = $(event.target).parents("tr").data("specIndex")
         simSpecs.splice(specIndex, 1)
         sims.splice(specIndex, 1)
         renderSimList()
         render()
         false
-    )

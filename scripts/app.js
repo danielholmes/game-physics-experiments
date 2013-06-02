@@ -271,7 +271,7 @@ addSim = function() {
   spec.accelerationName = $('input[name="acceleration"]:radio:checked').val();
   spec.stepName = $('input[name="stepType"]:radio:checked').val();
   if (spec.accelerationName === 'constant') {
-    spec.accelerationStepAmount = $("#accelerationConstantAmount").val();
+    spec.accelerationStepAmount = parseFloat($("#accelerationConstantAmount").val());
   }
   simSpecs.push(spec);
   renderSimList();
@@ -398,6 +398,11 @@ render = function() {
 };
 
 $(document).ready(function() {
+  if (window.requestAnimationFrame == null) {
+    window.requestAnimationFrame = window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback, element) {
+      return setTimeout(callback, 1000 / 60);
+    };
+  }
   $("#run-params").submit(function() {
     start();
     return false;
