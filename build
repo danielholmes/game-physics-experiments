@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./coffee -o scripts -b -c lib.coffee examples.coffee app.coffee
