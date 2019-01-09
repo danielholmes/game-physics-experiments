@@ -15,10 +15,8 @@ npm install
 ## Running
 
  1. ```./build``` to build once, ```./build-watch``` to continuously compile
- 2. View <a href="https://danielholmes.github.io/game-physics-experiments/examples.html" target="_blank">examples.html</a>
-    for some references or 
-    <a href="https://danielholmes.github.io/game-physics-experiments/app.html" target="_blank">app.html</a> for an 
-    interactive app
+ 2. View [examples.html](https://danielholmes.github.io/game-physics-experiments/examples.html) for some references or 
+    [app.html](https://danielholmes.github.io/game-physics-experiments/app.html) for an interactive app
 
 
 ## References
