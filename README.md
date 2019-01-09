@@ -15,7 +15,7 @@ npm install
 ## Running
 
  1. ```./build``` to build once, ```./build-watch``` to continuously compile
- 2. View ```examples.html``` for some references or ```app.html``` for an interactive app
+ 2. View [examples.html](./examples.html) for some references or [app.html](./app.html) for an interactive app
 
 
 ## References
